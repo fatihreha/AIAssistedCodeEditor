@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Code Generator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>AI Assisted Code Generator</h1>
+            <p>Enter your prompt below to generate Python code based on the Job class template</p>
+        </header>
+        
+        <main>
+            <form id="codeForm">
+                <div class="form-group">
+                    <label for="prompt">Your Prompt:</label>
+                    <textarea id="prompt" name="prompt" rows="5" placeholder="Describe the code you want to generate..." required></textarea>
+                </div>
+                <button type="submit" id="generateBtn">Generate Code</button>
+            </form>
+            
+            <div class="results" id="results" style="display: none;">
+                <div class="result-header">
+                    <h2 id="codeTitle">Generated Code</h2>
+                </div>
+                <div class="code-container">
+                    <pre><code id="generatedCode">// Code will appear here</code></pre>
+                </div>
+                <button id="copyBtn">Copy Code</button>
+            </div>
+            
+            <div id="loading" style="display: none;">
+                <div class="spinner"></div>
+                <p>Generating code...</p>
+            </div>
+            
+            <div id="error" style="display: none;">
+                <p class="error-message">An error occurred. Please try again.</p>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('codeForm');
+            const results = document.getElementById('results');
+            const loading = document.getElementById('loading');
+            const error = document.getElementById('error');
+            const codeTitle = document.getElementById('codeTitle');
+            const generatedCode = document.getElementById('generatedCode');
+            const copyBtn = document.getElementById('copyBtn');
+            
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                // Hide previous results and errors
+                results.style.display = 'none';
+                error.style.display = 'none';
+                
+                // Show loading indicator
+                loading.style.display = 'flex';
+                
+                const prompt = document.getElementById('prompt').value;
+                
+                try {
+                    const response = await fetch('/generate', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: new URLSearchParams({
+                            'prompt': prompt
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        // Update the results
+                        codeTitle.textContent = data.title;
+                        generatedCode.textContent = data.code;
+                        
+                        // Show the results
+                        results.style.display = 'block';
+                    } else {
+                        // Show error message
+                        error.querySelector('.error-message').textContent = data.error || 'An error occurred';
+                        error.style.display = 'block';
+                    }
+                } catch (err) {
+                    // Show error message
+                    error.querySelector('.error-message').textContent = 'Network error. Please try again.';
+                    error.style.display = 'block';
+                } finally {
+                    // Hide loading indicator
+                    loading.style.display = 'none';
+                }
+            });
+            
+            // Copy button functionality
+            copyBtn.addEventListener('click', function() {
+                const codeText = generatedCode.textContent;
+                navigator.clipboard.writeText(codeText).then(function() {
+                    const originalText = copyBtn.textContent;
+                    copyBtn.textContent = 'Copied!';
+                    copyBtn.classList.add('copied');
+                    setTimeout(function() {
+                        copyBtn.textContent = originalText;
+                        copyBtn.classList.remove('copied');
+                    }, 2000);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
