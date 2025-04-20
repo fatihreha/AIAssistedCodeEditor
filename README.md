@@ -61,16 +61,17 @@ docker build -t ai-code-generator .
 
 ## CI/CD, Docker and Kubernetes Integration
 
-This project provides automatic code synchronization from GitHub to GitLab, Docker image creation with GitLab CI/CD pipeline, and automatic deployment to a Kubernetes cluster.
+This project provides automatic code synchronization from GitHub to GitLab, Docker image creation with GitLab CI/CD pipeline, and automatic deployment to a Kubernetes cluster. Tüm bağlantılar ve pipeline ayarları yeni GitLab projesine göre güncellenmiştir.
 
 ### Automatic Code Synchronization
-- Code changes are automatically mirrored from GitHub to GitLab using GitHub Actions.
+- Code changes are automatically mirrored from GitHub to GitLab using GitHub Actions. For details, see the `CI_CD_SETUP.md` file.
 - For details, see the `CI_CD_KURULUM.md` file.
 
 ### GitLab CI/CD Pipeline
 - The code is built, tested, and the Docker image is automatically created and pushed to the registry.
 - After the pipeline is completed, automatic deployment to the Kubernetes cluster is performed.
 - Pipeline configuration: `.gitlab-ci.yml`
+- GitLab repository: `git@gitlab.com:GITLAB_KULLANICI_ADI/YENI_PROJE_ADI.git`
 
 ### Docker
 - The `Dockerfile` is located in the project root directory.
@@ -85,10 +86,39 @@ This project provides automatic code synchronization from GitHub to GitLab, Dock
 
 ### Kubernetes Deployment
 
-```
-kubectl apply -f kubernetes/deployment.yaml
-kubectl apply -f kubernetes/service.yaml
-```
+To deploy this project on Kubernetes, follow these steps:
+
+1. **Create the Namespace:**
+   ```bash
+   kubectl create namespace ai-applications
+   ```
+2. **Add your OpenAI API key as a Kubernetes secret:**
+   ```bash
+   kubectl create secret generic openai-api-secret --from-literal=api-key=YOUR_OPENAI_API_KEY -n ai-applications
+   ```
+3. **Build and push the Docker image:**
+   ```bash
+   docker build -t ai-code-generator .
+   # For Minikube:
+   minikube image load ai-code-generator
+   # Or for Docker Hub:
+   docker tag ai-code-generator yourusername/ai-code-generator
+   docker push yourusername/ai-code-generator
+   ```
+4. **Update the image name in `kubernetes/deployment.yaml` if using an external registry.**
+5. **Apply the Kubernetes manifests:**
+   ```bash
+   kubectl apply -f kubernetes/deployment.yaml
+   kubectl apply -f kubernetes/service.yaml
+   ```
+6. **Check the status of your deployment and service:**
+   ```bash
+   kubectl get pods -n ai-applications
+   kubectl get svc -n ai-applications
+   kubectl get ingress -n ai-applications
+   ```
+
+Make sure the namespace and secret names in your manifests match those you created above. The OpenAI API key should be base64 encoded if you edit the secret manifest directly.
 
 ## Usage
 
