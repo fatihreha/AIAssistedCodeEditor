@@ -1,7 +1,7 @@
 # ai_service.py
 
 import os
-import openai
+from openai import OpenAI
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -11,9 +11,7 @@ load_dotenv()
 api_key = os.getenv("OPENAI_API_KEY")
 
 # Initialize OpenAI client
-client = openai.OpenAI(
-    api_key=api_key
-)
+client = OpenAI(api_key=api_key)
 
 def generate_code_with_openai(prompt):
     """Generate Python code and title based on the provided prompt using OpenAI API
@@ -55,9 +53,9 @@ def generate_code_with_openai(prompt):
     """
     
     try:
-        # Create a chat completion with the OpenAI API
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",  # You can change this to a different model if needed
+        # Create a chat completion using the new OpenAI API format
+        completion = client.chat.completions.create(
+            model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": system_message},
                 {"role": "user", "content": prompt}
@@ -66,8 +64,8 @@ def generate_code_with_openai(prompt):
             max_tokens=2000
         )
         
-        # Extract the response content
-        content = response.choices[0].message.content
+        # Extract the response content using the new API response format
+        content = completion.choices[0].message.content
         
         # Parse the title and code from the response
         title_line = None
