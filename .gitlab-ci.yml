@@ -5,6 +5,19 @@ stages:
   - test
   - deploy
 
+# Test Kubernetes connection
+test-kubernetes-connection:
+  stage: test
+  image: bitnami/kubectl:latest
+  script:
+    - echo "$KUBE_CONFIG" | base64 -d > kubeconfig.yaml
+    - export KUBECONFIG=./kubeconfig.yaml
+    - kubectl config use-context my-cluster
+    - kubectl get nodes
+  only:
+    - main
+    - master
+
 variables:
   DOCKER_REGISTRY: "registry.gitlab.com/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}"
   DOCKER_IMAGE: "${DOCKER_REGISTRY}/ai-code-generator"
