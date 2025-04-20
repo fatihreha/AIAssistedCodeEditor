@@ -1,62 +1,62 @@
-# AI Assisted Code Editor - Kurulum ve Çalıştırma Rehberi
+# AI Assisted Code Editor - Installation and Usage Guide
 
-Bu rehber, AI Assisted Code Editor projesini yerel ortamda çalıştırmanız, Docker ile konteynerize etmeniz ve Kubernetes üzerinde dağıtmanız için gereken adımları içermektedir.
+This guide provides the steps required to run the AI Assisted Code Editor project locally, containerize it with Docker, and deploy it on Kubernetes.
 
-## Yerel Ortamda Çalıştırma
+## Running Locally
 
-### Gereksinimler
+### Requirements
 
-- Python 3.8 veya üzeri
-- pip (Python paket yöneticisi)
-- OpenAI API anahtarı
+- Python 3.8 or higher
+- pip (Python package manager)
+- OpenAI API key
 
-### Adımlar
+### Steps
 
-1. Gerekli bağımlılıkları yükleyin:
+1. Install the required dependencies:
    ```bash
    pip install -r requirements.txt
    ```
 
-2. `.env` dosyası oluşturun ve OpenAI API anahtarınızı ekleyin:
+2. Create a `.env` file and add your OpenAI API key:
    ```bash
-   echo "OPENAI_API_KEY=sizin_api_anahtariniz" > .env
+   echo "OPENAI_API_KEY=your_api_key_here" > .env
    ```
 
-3. Uygulamayı çalıştırın:
+3. Run the application:
    ```bash
    python app.py
    ```
 
-4. Tarayıcınızda `http://localhost:5000` adresine giderek uygulamaya erişebilirsiniz.
+4. Access the application in your browser at `http://localhost:5000`.
 
-## Docker ile Çalıştırma
+## Running with Docker
 
-### Gereksinimler
+### Requirements
 
 - Docker
-- OpenAI API anahtarı
+- OpenAI API key
 
-### Adımlar
+### Steps
 
-1. Docker imajını oluşturun:
+1. Build the Docker image:
    ```bash
    docker build -t ai-code-generator .
    ```
 
-2. Docker konteynerini çalıştırın:
+2. Run the Docker container:
    ```bash
-   docker run -p 5000:5000 -e OPENAI_API_KEY=sizin_api_anahtariniz ai-code-generator
+   docker run -p 5000:5000 -e OPENAI_API_KEY=your_api_key_here ai-code-generator
    ```
 
-3. Tarayıcınızda `http://localhost:5000` adresine giderek uygulamaya erişebilirsiniz.
+3. Access the application in your browser at `http://localhost:5000`.
 
-## Kubernetes ile Dağıtım
+## Deployment with Kubernetes
 
-### Gereksinimler
+### Requirements
 
-- Kubernetes cluster (Minikube, Docker Desktop Kubernetes, veya bulut tabanlı bir Kubernetes hizmeti)
-- kubectl komut satırı aracı
-- OpenAI API anahtarı
+- Kubernetes cluster (Minikube, Docker Desktop Kubernetes, or a cloud-based Kubernetes service)
+- kubectl command-line tool
+- OpenAI API key
 
 ### Adımlar
 

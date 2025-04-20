@@ -59,6 +59,30 @@ This project is an AI-powered code generator assistant that works through a simp
 docker build -t ai-code-generator .
 ```
 
+## CI/CD, Docker and Kubernetes Integration
+
+This project provides automatic code synchronization from GitHub to GitLab, Docker image creation with GitLab CI/CD pipeline, and automatic deployment to a Kubernetes cluster.
+
+### Automatic Code Synchronization
+- Code changes are automatically mirrored from GitHub to GitLab using GitHub Actions.
+- For details, see the `CI_CD_KURULUM.md` file.
+
+### GitLab CI/CD Pipeline
+- The code is built, tested, and the Docker image is automatically created and pushed to the registry.
+- After the pipeline is completed, automatic deployment to the Kubernetes cluster is performed.
+- Pipeline configuration: `.gitlab-ci.yml`
+
+### Docker
+- The `Dockerfile` is located in the project root directory.
+- The Docker image is automatically built and used during the pipeline.
+
+### Kubernetes
+- Deployment and service definitions are located in the `kubernetes/` directory.
+- The necessary config and secret settings for automatic deployment to the Kubernetes cluster are used in the pipeline.
+
+### Setup and Detailed Information
+- For all integration and automation steps, please review the `CI_CD_KURULUM.md` file.
+
 ### Kubernetes Deployment
 
 ```
