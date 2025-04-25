@@ -4,7 +4,7 @@ This document explains the setup of the CI/CD pipeline for automatic code synchr
 
 ## Automatic Synchronization from GitHub to GitLab
 
-1. Create a new project in GitLab (e.g., `git@gitlab.com:GITLAB_KULLANICI_ADI/YENI_PROJE_ADI.git`)
+1. Create a new project in GitLab (e.g., `git@gitlab.com:GITLAB_NICKNAME/NEW_PROJECT_NAME.git`)
 2. Add the following repository secrets in GitHub:
    - `GITLAB_USERNAME`: Your GitLab username
    - `GITLAB_SSH_PRIVATE_KEY`: SSH private key generated for your new GitLab project
@@ -56,7 +56,7 @@ kubectl create namespace ai-applications
 2. Add your Gemini API key as a Kubernetes secret:
 
 ```bash
-kubectl create secret generic openai-api-secret --from-literal=api-key=YOUR_OPENAI_API_KEY -n ai-applications
+kubectl create secret generic gemini-api-secret --from-literal=api-key=YOUR_OPENAI_API_KEY -n ai-applications
 ```
 
 ## Pipeline Workflow
@@ -67,4 +67,4 @@ kubectl create secret generic openai-api-secret --from-literal=api-key=YOUR_OPEN
    - Build the Docker image and push it to the registry
    - Deploy to Kubernetes
 
-Bu yapılandırma sayesinde, sadece GitHub'a kod push etmeniz yeterlidir. Değişiklikleriniz otomatik olarak yeni GitLab projenize yansıtılacak ve oradan da Kubernetes cluster'ınıza deploy edilecektir.
+With this configuration, you only need to push code to GitHub. Your changes will be automatically mirrored to your new GitLab project and then deployed to your Kubernetes cluster.

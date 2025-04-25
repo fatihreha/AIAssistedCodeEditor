@@ -3,116 +3,333 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Code Generator</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>AI Assisted Code Generator</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Highlight.js CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .code-container {
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background-color: white;
+            transition: all 0.3s ease;
+        }
+        .code-container:hover {
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            transform: translateY(-5px);
+        }
+        .header-container {
+            background: linear-gradient(135deg, #4e54c8, #8f94fb);
+            color: white;
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        .btn-generate {
+            background: linear-gradient(135deg, #4e54c8, #8f94fb);
+            border: none;
+            transition: all 0.3s ease;
+        }
+        .btn-generate:hover {
+            background: linear-gradient(135deg, #3f44a8, #7f84eb);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .form-control:focus {
+            border-color: #8f94fb;
+            box-shadow: 0 0 0 0.25rem rgba(143, 148, 251, 0.25);
+        }
+        pre {
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            padding: 1rem;
+            margin: 0;
+        }
+        .error-message {
+            background-color: #f8d7da;
+            color: #842029;
+            border-radius: 5px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        .loading-spinner {
+            display: none;
+            margin-left: 10px;
+        }
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .history-item {
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 5px;
+            background-color: #f1f3f5;
+            transition: all 0.2s ease;
+        }
+        .history-item:hover {
+            background-color: #e9ecef;
+        }
+        .history-container {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .history-timestamp {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+        .hljs {
+            padding: 0;
+            background: transparent;
+        }
+        .tab-content {
+            padding-top: 20px;
+        }
+        .nav-tabs .nav-link {
+            color: #495057;
+        }
+        .nav-tabs .nav-link.active {
+            color: #4e54c8;
+            font-weight: 500;
+        }
+        .clear-history-btn {
+            font-size: 0.9rem;
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>AI Assisted Code Generator</h1>
-            <p>Enter your prompt below to generate Python code based on the Job class template</p>
-        </header>
-        
-        <main>
-            <form id="codeForm">
-                <div class="form-group">
-                    <label for="prompt">Your Prompt:</label>
-                    <textarea id="prompt" name="prompt" rows="5" placeholder="Describe the code you want to generate..." required></textarea>
+    <div class="container py-5">
+        <div class="header-container text-center">
+            <h1 class="display-4 mb-3"><i class="fas fa-code me-3"></i>AI Assisted Code Generator</h1>
+            <p class="lead">Enter your prompt below to generate Python code based on the Job class template</p>
+        </div>
+
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="generator-tab" data-bs-toggle="tab" data-bs-target="#generator" type="button" role="tab" aria-controls="generator" aria-selected="true">
+                    <i class="fas fa-magic me-2"></i>Code Generator
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="history-tab" data-bs-toggle="tab" data-bs-target="#history" type="button" role="tab" aria-controls="history" aria-selected="false">
+                    <i class="fas fa-history me-2"></i>Query History
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade show active" id="generator" role="tabpanel" aria-labelledby="generator-tab">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="code-container p-4 mb-4">
+                            <h2 class="mb-3">Your Query:</h2>
+                            <form id="codeForm" method="post">
+                                <div class="mb-3">
+                                    <textarea class="form-control" id="prompt" name="prompt" rows="5" placeholder="Explain what you want the code to do..." required></textarea>
+                                </div>
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                    <button type="submit" class="btn btn-primary btn-generate px-4 py-2">
+                                        <i class="fas fa-magic me-2"></i>Generate Code
+                                        <div class="spinner-border spinner-border-sm loading-spinner" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
-                <button type="submit" id="generateBtn">Generate Code</button>
-            </form>
-            
-            <div class="results" id="results" style="display: none;">
-                <div class="result-header">
-                    <h2 id="codeTitle">Generated Code</h2>
+
+                {% if error %}
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="error-message">
+                            <i class="fas fa-exclamation-triangle me-2"></i>{{ error }}
+                        </div>
+                    </div>
                 </div>
-                <div class="code-container">
-                    <pre><code id="generatedCode">// Code will appear here</code></pre>
+                {% endif %}
+
+                {% if title and code %}
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="code-container p-4 position-relative">
+                            <h2 class="mb-3">{{ title }}</h2>
+                            <button class="copy-btn" onclick="copyCode()">
+                                <i class="far fa-copy me-1"></i>Copy
+                            </button>
+                            <pre><code id="generatedCode" class="python">{{ code }}</code></pre>
+                        </div>
+                    </div>
                 </div>
-                <button id="copyBtn">Copy Code</button>
+                {% endif %}
             </div>
-            
-            <div id="loading" style="display: none;">
-                <div class="spinner"></div>
-                <p>Generating code...</p>
+
+            <div class="tab-pane fade" id="history" role="tabpanel" aria-labelledby="history-tab">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="code-container p-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h2 class="mb-0">Query History</h2>
+                                <button class="btn btn-sm btn-outline-danger clear-history-btn" onclick="clearHistory()">
+                                    <i class="fas fa-trash me-1"></i>Clear History
+                                </button>
+                            </div>
+                            <div id="historyContainer" class="history-container">
+                                <!-- History queries will be added here -->
+                                <div class="text-center text-muted py-4" id="noHistoryMessage">
+                                    <i class="fas fa-history fa-2x mb-3"></i>
+                                    <p>No query history yet.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            
-            <div id="error" style="display: none;">
-                <p class="error-message">An error occurred. Please try again.</p>
-            </div>
-        </main>
+        </div>
     </div>
-    
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Highlight.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/languages/python.min.js"></script>
     <script>
+        // Initialize Highlight.js for code highlighting
         document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('codeForm');
-            const results = document.getElementById('results');
-            const loading = document.getElementById('loading');
-            const error = document.getElementById('error');
-            const codeTitle = document.getElementById('codeTitle');
-            const generatedCode = document.getElementById('generatedCode');
-            const copyBtn = document.getElementById('copyBtn');
+            const codeElement = document.getElementById('generatedCode');
+            if (codeElement) {
+                hljs.highlightElement(codeElement);
+            }
+        });
+
+        // When form is submitted
+        document.getElementById('codeForm').addEventListener('submit', function(e) {
+            const spinner = document.querySelector('.loading-spinner');
+            spinner.style.display = 'inline-block';
             
-            form.addEventListener('submit', async function(e) {
-                e.preventDefault();
-                
-                // Hide previous results and errors
-                results.style.display = 'none';
-                error.style.display = 'none';
-                
-                // Show loading indicator
-                loading.style.display = 'flex';
-                
-                const prompt = document.getElementById('prompt').value;
-                
-                try {
-                    const response = await fetch('/generate', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                        },
-                        body: new URLSearchParams({
-                            'prompt': prompt
-                        })
-                    });
-                    
-                    const data = await response.json();
-                    
-                    if (response.ok) {
-                        // Update the results
-                        codeTitle.textContent = data.title;
-                        generatedCode.textContent = data.code;
-                        
-                        // Show the results
-                        results.style.display = 'block';
-                    } else {
-                        // Show error message
-                        error.querySelector('.error-message').textContent = data.error || 'An error occurred';
-                        error.style.display = 'block';
-                    }
-                } catch (err) {
-                    // Show error message
-                    error.querySelector('.error-message').textContent = 'Network error. Please try again.';
-                    error.style.display = 'block';
-                } finally {
-                    // Hide loading indicator
-                    loading.style.display = 'none';
-                }
-            });
+            // Save query to history
+            const promptText = document.getElementById('prompt').value.trim();
+            if (promptText) {
+                saveToHistory(promptText);
+            }
+        });
+
+        // Function to copy code
+        function copyCode() {
+            const codeElement = document.getElementById('generatedCode');
+            const textArea = document.createElement('textarea');
+            textArea.value = codeElement.textContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
             
-            // Copy button functionality
-            copyBtn.addEventListener('click', function() {
-                const codeText = generatedCode.textContent;
-                navigator.clipboard.writeText(codeText).then(function() {
-                    const originalText = copyBtn.textContent;
-                    copyBtn.textContent = 'Copied!';
-                    copyBtn.classList.add('copied');
-                    setTimeout(function() {
-                        copyBtn.textContent = originalText;
-                        copyBtn.classList.remove('copied');
-                    }, 2000);
+            const copyBtn = document.querySelector('.copy-btn');
+            const originalText = copyBtn.innerHTML;
+            copyBtn.innerHTML = '<i class="fas fa-check me-1"></i>Copied!';
+            setTimeout(() => {
+                copyBtn.innerHTML = originalText;
+            }, 2000);
+        }
+
+        // Load query history from localStorage
+        function loadHistory() {
+            const history = JSON.parse(localStorage.getItem('promptHistory') || '[]');
+            const historyContainer = document.getElementById('historyContainer');
+            const noHistoryMessage = document.getElementById('noHistoryMessage');
+            
+            if (history.length > 0) {
+                noHistoryMessage.style.display = 'none';
+                historyContainer.innerHTML = '';
+                
+                history.forEach((item, index) => {
+                    const historyItem = document.createElement('div');
+                    historyItem.className = 'history-item';
+                    historyItem.onclick = function() { useHistoryItem(item.prompt); };
+                    
+                    const date = new Date(item.timestamp);
+                    const formattedDate = `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+                    
+                    historyItem.innerHTML = `
+                        <div class="d-flex justify-content-between">
+                            <strong>${truncateText(item.prompt, 50)}</strong>
+                            <span class="history-timestamp">${formattedDate}</span>
+                        </div>
+                        <p class="mb-0 text-muted">${truncateText(item.prompt, 100)}</p>
+                    `;
+                    
+                    historyContainer.appendChild(historyItem);
                 });
+            } else {
+                noHistoryMessage.style.display = 'block';
+            }
+        }
+
+        // Geçmişe sorgu kaydetme
+        function saveToHistory(promptText) {
+            const history = JSON.parse(localStorage.getItem('promptHistory') || '[]');
+            
+            // Aynı sorgu zaten varsa, onu kaldır (daha sonra en üste eklenecek)
+            const filteredHistory = history.filter(item => item.prompt !== promptText);
+            
+            // Yeni sorguyu ekle
+            filteredHistory.unshift({
+                prompt: promptText,
+                timestamp: new Date().toISOString()
             });
+            
+            // Geçmişi en fazla 20 öğe ile sınırla
+            const limitedHistory = filteredHistory.slice(0, 20);
+            
+            // Geçmişi kaydet
+            localStorage.setItem('promptHistory', JSON.stringify(limitedHistory));
+            
+            // Geçmiş sekmesi açıksa, görünümü güncelle
+            if (document.getElementById('history').classList.contains('show')) {
+                loadHistory();
+            }
+        }
+
+        // Geçmiş öğesini kullanma
+        function useHistoryItem(promptText) {
+            document.getElementById('prompt').value = promptText;
+            document.getElementById('generator-tab').click();
+            document.getElementById('prompt').focus();
+        }
+
+        // Geçmişi temizleme
+        function clearHistory() {
+            if (confirm('Are you sure you want to clear all your query history?')) {
+                localStorage.removeItem('promptHistory');
+                loadHistory();
+            }
+        }
+
+        // Metni kısaltma yardımcı fonksiyonu
+        function truncateText(text, maxLength) {
+            if (text.length <= maxLength) return text;
+            return text.substring(0, maxLength) + '...';
+        }
+
+        // Sekme değiştiğinde geçmişi yükle
+        document.getElementById('history-tab').addEventListener('shown.bs.tab', function (e) {
+            loadHistory();
         });
     </script>
 </body>

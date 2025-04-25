@@ -50,58 +50,45 @@ This guide provides the steps required to run the AI Assisted Code Editor projec
 
 3. Access the application in your browser at `http://localhost:5000`.
 
+# AI Assisted Code Editor - Installation and Usage Guide
 ## Deployment with Kubernetes
+### Steps
 
-### Requirements
-
-- Kubernetes cluster (Minikube, Docker Desktop Kubernetes, or a cloud-based Kubernetes service)
-- kubectl command-line tool
-- OpenAI API key
-
-### Adımlar
-
-1. OpenAI API anahtarınızı Base64 formatına dönüştürün:
+1. Convert your OpenAI API key to Base64 format:
    ```bash
-   echo -n "sizin_api_anahtariniz" | base64
+   echo -n "your_api_key" | base64
    ```
 
-2. `kubernetes/deployment.yaml` dosyasında, `openai-api-secret` Secret kaynağındaki `api-key` değerini, yukarıdaki komuttan elde ettiğiniz Base64 kodlu API anahtarı ile değiştirin.
-
-3. Docker imajını oluşturun ve Kubernetes cluster'ınızın erişebileceği bir Docker registry'sine gönderin:
-   ```bash
+2. In the kubernetes/deployment.yaml file, replace the api-key value in the openai-api-secret Secret resource with the Base64 encoded API key you obtained from the above command.
+3.  Build the Docker image and push it to a Docker registry accessible by your Kubernetes cluster:
    docker build -t ai-code-generator .
-   # Eğer yerel Minikube kullanıyorsanız:
+   # If using local Minikube:
    minikube image load ai-code-generator
-   # Veya Docker Hub gibi bir registry kullanıyorsanız:
-   docker tag ai-code-generator kullanici_adiniz/ai-code-generator
-   docker push kullanici_adiniz/ai-code-generator
+   # Or if using a registry like Docker Hub:
+   docker tag ai-code-generator your_username/ai-code-generator
+   docker push your_username/ai-code-generator
    ```
 
-4. Eğer harici bir registry kullanıyorsanız, `kubernetes/deployment.yaml` dosyasındaki imaj adını güncelleyin.
-
-5. Kubernetes kaynaklarını oluşturun:
-   ```bash
+4. If using an external registry, update the image name in the kubernetes/deployment.yaml file.
+5. Create the Kubernetes resources:
    kubectl apply -f kubernetes/deployment.yaml
-   ```
+   kubectl apply -f kubernetes/service.yaml
 
-6. Servisin durumunu kontrol edin:
-   ```bash
+6. Check the service status:
    kubectl get svc ai-code-generator
-   ```
 
-7. LoadBalancer IP'si veya NodePort üzerinden uygulamaya erişebilirsiniz. Minikube kullanıyorsanız:
-   ```bash
+
+7. You can access the application via the LoadBalancer IP or NodePort. If using Minikube:
    minikube service ai-code-generator
-   ```
 
-## Sorun Giderme
+## Troubleshooting
 
-- **API Anahtarı Hatası**: `.env` dosyasında veya Kubernetes secret'ında doğru API anahtarının tanımlandığından emin olun.
-- **Port Çakışması**: 5000 portu başka bir uygulama tarafından kullanılıyorsa, `app.py` dosyasında veya Docker/Kubernetes yapılandırmalarında port numarasını değiştirin.
-- **Kubernetes Pod Hatası**: `kubectl describe pod <pod-adı>` komutu ile pod durumunu kontrol edin.
+- **API Key Error**: Make sure the correct API key is defined in the `.env` file or in the Kubernetes secret.
+- **Port Conflict**: If port 5000 is being used by another application, change the port number in the `app.py` file or in the Docker/Kubernetes configurations.
+- **Kubernetes Pod Error**: Check the pod status with the `kubectl describe pod <pod-name>` command.
 
-## Notlar
+## Notes
 
-- Uygulama varsayılan olarak 5000 portunda çalışır.
-- Kubernetes yapılandırması, uygulamanın sağlık durumunu kontrol etmek için `/health` endpoint'ini kullanır.
-- Üretim ortamında kullanmadan önce güvenlik ayarlarını gözden geçirin ve gerekli önlemleri alın.
+- The application runs on port 5000 by default.
+- The Kubernetes configuration uses the `/health` endpoint to check the health status of the application.
+- Review security settings and take necessary precautions before using in a production environment.

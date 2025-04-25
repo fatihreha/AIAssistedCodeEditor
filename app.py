@@ -4,7 +4,7 @@ import os
 from flask import Flask, render_template, request, jsonify
 from dotenv import load_dotenv
 from models.job import Job
-# OpenAI yerine Gemini import'ları
+# Import Gemini instead of OpenAI
 from ai_service import generate_code_with_gemini
 
 # Load environment variables from .env file
@@ -18,7 +18,7 @@ def index():
     """Render the main page"""
     return render_template('index.html')
 
-# OpenAI yerine Gemini import'ları
+# Import Gemini instead of OpenAI
 from ai_service import generate_code_with_gemini
 
 @app.route('/generate', methods=['POST'])
@@ -32,7 +32,7 @@ def generate():
         }), 400
     
     try:
-        # OpenAI yerine Gemini kullanın
+        # Use Gemini instead of OpenAI
         title, code = generate_code_with_gemini(prompt)
         
         return jsonify({
@@ -50,6 +50,11 @@ def health():
     return jsonify({
         'status': 'healthy'
     })
+
+@app.route('/list-models')
+def list_models():
+    models = ai_service.list_available_models()
+    return jsonify(models)
 
 if __name__ == '__main__':
     # Get port from environment variable or use 5000 as default

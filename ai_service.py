@@ -54,7 +54,13 @@ def generate_code_with_gemini(prompt):
     
     try:
         # Initialize the Gemini model
-        model = genai.GenerativeModel('gemini-1.0-pro')
+        generation_config = {
+            "temperature": 0.7,
+            "top_p": 0.95,
+            "top_k": 40,
+        }
+        model = genai.GenerativeModel(model_name='gemini-1.5-pro', 
+                                     generation_config=generation_config)
         
         # Create a chat session
         chat = model.start_chat(history=[])
@@ -98,3 +104,12 @@ def generate_code_with_gemini(prompt):
         
     except Exception as e:
         raise Exception(f"Error generating code: {str(e)}")
+
+
+def list_available_models():
+    """List all available Gemini models for the configured API key"""
+    try:
+        models = genai.list_models()
+        return [model.name for model in models]
+    except Exception as e:
+        return f"Error listing models: {str(e)}"
