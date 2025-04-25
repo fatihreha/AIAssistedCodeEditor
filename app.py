@@ -27,22 +27,15 @@ def generate():
     prompt = request.form.get('prompt')
     
     if not prompt:
-        return jsonify({
-            'error': 'Prompt is required'
-        }), 400
+        return render_template('index.html', error='Prompt is required')
     
     try:
         # Use Gemini instead of OpenAI
         title, code = generate_code_with_gemini(prompt)
         
-        return jsonify({
-            'title': title,
-            'code': code
-        })
+        return render_template('index.html', title=title, code=code)
     except Exception as e:
-        return jsonify({
-            'error': str(e)
-        }), 500
+        return render_template('index.html', error=str(e))
 
 @app.route('/health')
 def health():
