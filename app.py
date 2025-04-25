@@ -4,7 +4,8 @@ import os
 from flask import Flask, render_template, request, jsonify
 from dotenv import load_dotenv
 from models.job import Job
-from ai_service import generate_code_with_openai
+# OpenAI yerine Gemini import'ları
+from ai_service import generate_code_with_gemini
 
 # Load environment variables from .env file
 load_dotenv()
@@ -17,6 +18,9 @@ def index():
     """Render the main page"""
     return render_template('index.html')
 
+# OpenAI yerine Gemini import'ları
+from ai_service import generate_code_with_gemini
+
 @app.route('/generate', methods=['POST'])
 def generate():
     """Generate code based on the provided prompt"""
@@ -28,8 +32,8 @@ def generate():
         }), 400
     
     try:
-        # Generate code using OpenAI
-        title, code = generate_code_with_openai(prompt)
+        # OpenAI yerine Gemini kullanın
+        title, code = generate_code_with_gemini(prompt)
         
         return jsonify({
             'title': title,

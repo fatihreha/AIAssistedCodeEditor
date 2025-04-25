@@ -53,7 +53,7 @@ Copy the resulting base64 string and add it as the `KUBE_CONFIG` variable in you
 kubectl create namespace ai-applications
 ```
 
-2. Add your OpenAI API key as a Kubernetes secret:
+2. Add your Gemini API key as a Kubernetes secret:
 
 ```bash
 kubectl create secret generic openai-api-secret --from-literal=api-key=YOUR_OPENAI_API_KEY -n ai-applications

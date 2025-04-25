@@ -22,10 +22,10 @@ spec:
         ports:
         - containerPort: 5000
         env:
-        - name: OPENAI_API_KEY
+        - name: GEMINI_API_KEY
           valueFrom:
             secretKeyRef:
-              name: openai-api-secret
+              name: gemini-api-secret
               key: api-key
         - name: PORT
           value: "5000"
@@ -54,12 +54,12 @@ spec:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: openai-api-secret
+  name: gemini-api-secret
   namespace: ai-applications
 type: Opaque
 data:
   # Base64 encoded API key will be provided during deployment
-  api-key: ""
+  api-key: "QUl6YVN5QlZnSDNmUlV0LXRjLU40a3ROdWplVzJnOVVreFhYWlVCdw=="
 ---
 apiVersion: v1
 kind: Service

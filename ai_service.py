@@ -1,22 +1,20 @@
 # ai_service.py
 
 import os
-from openai import OpenAI
+import google.generativeai as genai
 from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
 
 # Get API key from environment variable
-api_key = os.getenv("OPENAI_API_KEY")
+api_key = os.getenv("GEMINI_API_KEY")
 
-# Initialize OpenAI client
-client = OpenAI(
-    api_key=api_key
-)
+# Configure the Gemini API
+genai.configure(api_key=api_key)
 
-def generate_code_with_openai(prompt):
-    """Generate Python code and title based on the provided prompt using OpenAI API
+def generate_code_with_gemini(prompt):
+    """Generate Python code and title based on the provided prompt using Google Gemini API
     
     Args:
         prompt (str): User's prompt for code generation
@@ -55,19 +53,17 @@ def generate_code_with_openai(prompt):
     """
     
     try:
-        # Create a chat completion using the OpenAI API
-        completion = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": system_message},
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.7,
-            max_tokens=2000
-        )
+        # Initialize the Gemini model
+        model = genai.GenerativeModel('gemini-1.0-pro')
+        
+        # Create a chat session
+        chat = model.start_chat(history=[])
+        
+        # Send the system message and user prompt
+        response = chat.send_message(f"{system_message}\n\nUser prompt: {prompt}")
         
         # Extract the response content
-        content = completion.choices[0].message.content
+        content = response.text
         
         # Parse the title and code from the response
         title_line = None
