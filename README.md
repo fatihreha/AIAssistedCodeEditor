@@ -5,7 +5,7 @@ This project is an AI-powered code generator assistant that works through a simp
 ## Features
 
 - Web interface for entering prompts
-- AI-powered code generation using OpenAI API
+- AI-powered code generation using Gemini API
 - Generated code based on the provided Job class template
 - Meaningful title generation for each code snippet
 - Kubernetes deployment support
@@ -13,7 +13,7 @@ This project is an AI-powered code generator assistant that works through a simp
 ## Technical Components
 
 1. **Model Integration**
-   - Uses OpenAI API for code generation
+   - Uses Gemini API for code generation
    - Custom system prompt to guide the AI response format
 
 2. **Python Integration**
@@ -35,14 +35,14 @@ This project is an AI-powered code generator assistant that works through a simp
 - Python 3.8+
 - Docker
 - Kubernetes cluster or Minikube
-- OpenAI API key
+- Gemini API key
 
 ### Local Development
 
 1. Clone the repository
-2. Create a `.env` file with your OpenAI API key:
+2. Create a `.env` file with your Gemini API key:
    ```
-   OPENAI_API_KEY=your_api_key_here
+   GEMINI_API_KEY=your_api_key_here
    ```
 3. Install dependencies:
    ```
